@@ -50,6 +50,8 @@ import type { SessionData, SessionStore } from "./adapters/types.ts";
 
 /**
  * Cookie 选项
+ * 从 @dreamer/http 导入，保持类型一致性
+ * 如果 HTTP 库还未实现，这里提供临时定义
  */
 export interface CookieOptions {
   /** 过期时间（毫秒） */
@@ -67,6 +69,9 @@ export interface CookieOptions {
   /** SameSite 策略 */
   sameSite?: "strict" | "lax" | "none";
 }
+
+// TODO: 当 HTTP 库实现后，改为从 HTTP 库导入
+// import type { CookieOptions } from "jsr:@dreamer/http";
 
 /**
  * Session 配置选项
@@ -88,7 +93,14 @@ export interface SessionOptions {
 
 /**
  * HTTP 上下文接口（需要与 @dreamer/http 集成）
- * 注意：这个接口需要与 @dreamer/http 的 HttpContext 兼容
+ *
+ * 注意：
+ * 1. 这个接口用于 Session 中间件的类型约束
+ * 2. 实际的 HttpContext 类型由 @dreamer/http 定义
+ * 3. session 属性通过模块增强（types.d.ts）添加到 HttpContext
+ *
+ * TODO: 当 HTTP 库实现后，改为从 HTTP 库导入
+ * import type { HttpContext } from "jsr:@dreamer/http";
  */
 export interface HttpContext {
   /** Cookie 操作 */
@@ -97,7 +109,7 @@ export interface HttpContext {
     set(name: string, value: string, options?: CookieOptions): void;
     remove(name: string): void;
   };
-  /** Session 数据（由中间件添加） */
+  /** Session 数据（由中间件添加，通过模块增强添加到 HttpContext） */
   session?: SessionData;
 }
 
@@ -114,7 +126,9 @@ function generateSessionId(): string {
  * Session 中间件
  * 用于与 HTTP 库集成，自动管理 Session
  */
-export function session(options: SessionOptions) {
+export function session(
+  options: SessionOptions,
+): (ctx: HttpContext, next: () => Promise<void>) => Promise<void> {
   const {
     store,
     name = "sessionId",
@@ -250,3 +264,7 @@ export type {
   SessionData,
   SessionStore,
 } from "./adapters/mod.ts";
+
+// 导出类型定义（模块增强会自动生效）
+// 注意：types.d.ts 中的模块增强会在导入时自动生效
+// 用户只需要导入 session 中间件即可获得类型支持
