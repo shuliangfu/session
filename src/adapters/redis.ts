@@ -194,10 +194,10 @@ export class RedisSessionAdapter implements SessionStore {
   /**
    * 清空所有 Session（Redis 不支持直接清空所有 session，需要遍历）
    */
-  async clear(): Promise<void> {
+  clear(): Promise<void> {
     // Redis 不支持直接清空所有 session，需要遍历删除
     // 这里不实现，因为性能问题
-    throw new Error("RedisSessionAdapter 不支持 clear() 方法");
+    return Promise.reject(new Error("RedisSessionAdapter 不支持 clear() 方法"));
   }
 
   /**

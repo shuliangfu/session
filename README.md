@@ -1,15 +1,18 @@
 # @dreamer/session
 
-> 一个兼容 Deno 和 Bun 的持久化 Session 会话管理库，提供统一的 Session 管理接口，支持多种存储后端（Redis、MongoDB、文件）
+> 一个兼容 Deno 和 Bun 的持久化 Session 会话管理库，提供统一的 Session
+> 管理接口，支持多种存储后端（Redis、MongoDB、文件）
 
 [![JSR](https://jsr.io/badges/@dreamer/session)](https://jsr.io/@dreamer/session)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
+[![Tests: 28 passed](https://img.shields.io/badge/Tests-28%20passed-brightgreen)](./TEST_REPORT.md)
 
 ---
 
 ## 🎯 功能
 
-持久化 Session 会话管理库，提供统一的 Session 管理接口，支持多种存储后端，用于用户会话管理、状态保持等场景。
+持久化 Session 会话管理库，提供统一的 Session
+管理接口，支持多种存储后端，用于用户会话管理、状态保持等场景。
 
 ---
 
@@ -38,17 +41,22 @@
   - MongoDB 适配器（MongoDBSessionAdapter）
   - 文件适配器（FileSessionAdapter）
   - 运行时切换存储后端
+- **服务容器集成**：
+  - 支持 `@dreamer/service` 依赖注入
+  - 管理多个 SessionManager 实例
+  - 提供 `createSessionManager` 工厂函数
 
 ---
 
 ## 🎨 设计原则
 
-**所有 @dreamer/* 库都遵循以下原则**：
+__所有 @dreamer/_ 库都遵循以下原则_*：
 
 - **主包（@dreamer/xxx）**：用于服务端（兼容 Deno 和 Bun 运行时）
 - **客户端子包（@dreamer/xxx/client）**：用于客户端（浏览器环境）
 
 这样可以：
+
 - 明确区分服务端和客户端代码
 - 避免在客户端代码中引入服务端依赖
 - 提供更好的类型安全和代码提示
@@ -86,13 +94,14 @@ bunx jsr add @dreamer/session
 
 ## 🌍 环境兼容性
 
-| 环境 | 版本要求 | 状态 |
-|------|---------|------|
-| **Deno** | 2.5+ | ✅ 完全支持 |
-| **Bun** | 1.0+ | ✅ 完全支持 |
-| **服务端** | - | ✅ 支持（兼容 Deno 和 Bun 运行时，支持 Redis、MongoDB、文件存储） |
-| **客户端** | - | ❌ 不支持（纯服务端库） |
-| **依赖** | `redis@^5.10.0`, `mongodb@^6.10.0` | 📦 用于 Redis 和 MongoDB 适配器（可选） |
+| 环境         | 版本要求                             | 状态                                                              |
+| ------------ | ------------------------------------ | ----------------------------------------------------------------- |
+| **Deno**     | 2.5+                                 | ✅ 完全支持                                                       |
+| **Bun**      | 1.0+                                 | ✅ 完全支持                                                       |
+| **服务端**   | -                                    | ✅ 支持（兼容 Deno 和 Bun 运行时，支持 Redis、MongoDB、文件存储） |
+| **客户端**   | -                                    | ❌ 不支持（纯服务端库）                                           |
+| **依赖**     | `redis@^5.10.0`, `mongodb@^6.10.0`   | 📦 用于 Redis 和 MongoDB 适配器（可选）                           |
+| **可选依赖** | `jsr:@dreamer/service@^1.0.0-beta.4` | 📦 用于服务容器集成（可选）                                       |
 
 ---
 
@@ -101,7 +110,7 @@ bunx jsr add @dreamer/session
 ### 使用 Redis 存储（推荐用于生产环境）
 
 ```typescript
-import { session, RedisSessionAdapter } from "jsr:@dreamer/session";
+import { RedisSessionAdapter, session } from "jsr:@dreamer/session";
 import { Http } from "jsr:@dreamer/http";
 
 const app = new Http();
@@ -151,7 +160,7 @@ await app.listen({ port: 8000 });
 ### 使用 MongoDB 存储
 
 ```typescript
-import { session, MongoDBSessionAdapter } from "jsr:@dreamer/session";
+import { MongoDBSessionAdapter, session } from "jsr:@dreamer/session";
 import { Http } from "jsr:@dreamer/http";
 
 const app = new Http();
@@ -183,7 +192,7 @@ app.get("/login", async (ctx) => {
 ### 使用文件存储（适合单机应用）
 
 ```typescript
-import { session, FileSessionAdapter } from "jsr:@dreamer/session";
+import { FileSessionAdapter, session } from "jsr:@dreamer/session";
 import { Http } from "jsr:@dreamer/http";
 
 const app = new Http();
@@ -209,7 +218,7 @@ app.get("/login", async (ctx) => {
 ### 使用自定义客户端实例
 
 ```typescript
-import { session, RedisSessionAdapter } from "jsr:@dreamer/session";
+import { RedisSessionAdapter, session } from "jsr:@dreamer/session";
 import { createClient } from "redis";
 
 // 使用已存在的 Redis 客户端
@@ -229,7 +238,7 @@ app.use(session({ store }));
 ### 手动管理 Session（不使用中间件）
 
 ```typescript
-import { SessionManager, RedisSessionAdapter } from "jsr:@dreamer/session";
+import { RedisSessionAdapter, SessionManager } from "jsr:@dreamer/session";
 
 const store = new RedisSessionAdapter({
   connection: { host: "127.0.0.1", port: 6379 },
@@ -289,27 +298,29 @@ interface SessionStore {
 基于 Redis 的 Session 存储适配器。
 
 **配置选项**：
+
 ```typescript
 interface RedisSessionAdapterOptions {
-  connection?: RedisConnectionConfig;  // Redis 连接配置
-  client?: RedisClient;                // Redis 客户端实例
-  keyPrefix?: string;                  // 键前缀（默认：session）
+  connection?: RedisConnectionConfig; // Redis 连接配置
+  client?: RedisClient; // Redis 客户端实例
+  keyPrefix?: string; // 键前缀（默认：session）
 }
 
 interface RedisConnectionConfig {
-  url?: string;                        // Redis 连接 URL
-  host?: string;                       // Redis 主机（默认：127.0.0.1）
-  port?: number;                       // Redis 端口（默认：6379）
-  password?: string;                   // Redis 密码
-  db?: number;                         // Redis 数据库编号（默认：0）
+  url?: string; // Redis 连接 URL
+  host?: string; // Redis 主机（默认：127.0.0.1）
+  port?: number; // Redis 端口（默认：6379）
+  password?: string; // Redis 密码
+  db?: number; // Redis 数据库编号（默认：0）
   socket?: {
-    keepAlive?: boolean;               // 是否启用 keepAlive
-    connectTimeout?: number;           // 连接超时时间（毫秒）
+    keepAlive?: boolean; // 是否启用 keepAlive
+    connectTimeout?: number; // 连接超时时间（毫秒）
   };
 }
 ```
 
 **示例**：
+
 ```typescript
 const store = new RedisSessionAdapter({
   connection: {
@@ -326,26 +337,28 @@ const store = new RedisSessionAdapter({
 基于 MongoDB 的 Session 存储适配器。
 
 **配置选项**：
+
 ```typescript
 interface MongoDBSessionAdapterOptions {
-  connection?: MongoDBConnectionConfig;  // MongoDB 连接配置
-  client?: MongoDBClient;                // MongoDB 客户端实例
-  database?: string;                     // 数据库名称（如果只提供 client，必须提供）
-  collectionName?: string;               // 集合名称（默认：sessions）
+  connection?: MongoDBConnectionConfig; // MongoDB 连接配置
+  client?: MongoDBClient; // MongoDB 客户端实例
+  database?: string; // 数据库名称（如果只提供 client，必须提供）
+  collectionName?: string; // 集合名称（默认：sessions）
 }
 
 interface MongoDBConnectionConfig {
-  url?: string;                          // MongoDB 连接 URL
-  host?: string;                         // MongoDB 主机（默认：127.0.0.1）
-  port?: number;                         // MongoDB 端口（默认：27017）
-  database: string;                      // 数据库名称（必须）
-  username?: string;                     // 用户名
-  password?: string;                     // 密码
-  authSource?: string;                   // 认证数据库
+  url?: string; // MongoDB 连接 URL
+  host?: string; // MongoDB 主机（默认：127.0.0.1）
+  port?: number; // MongoDB 端口（默认：27017）
+  database: string; // 数据库名称（必须）
+  username?: string; // 用户名
+  password?: string; // 密码
+  authSource?: string; // 认证数据库
 }
 ```
 
 **示例**：
+
 ```typescript
 const store = new MongoDBSessionAdapter({
   connection: {
@@ -362,14 +375,16 @@ const store = new MongoDBSessionAdapter({
 基于文件系统的 Session 存储适配器。
 
 **配置选项**：
+
 ```typescript
 interface FileSessionAdapterOptions {
-  sessionDir?: string;  // Session 存储目录（默认：./sessions）
-  prefix?: string;      // 文件前缀（可选）
+  sessionDir?: string; // Session 存储目录（默认：./sessions）
+  prefix?: string; // 文件前缀（可选）
 }
 ```
 
 **示例**：
+
 ```typescript
 const store = new FileSessionAdapter({
   sessionDir: "./sessions",
@@ -384,28 +399,30 @@ const store = new FileSessionAdapter({
 创建 Session 中间件，用于与 HTTP 库集成。
 
 **配置选项**：
+
 ```typescript
 interface SessionOptions {
-  store: SessionStore;                  // Session 存储适配器（必须）
-  name?: string;                        // Cookie 名称（默认：sessionId）
-  maxAge?: number;                      // Session 过期时间（毫秒，默认：86400000，24 小时）
-  cookie?: CookieOptions;               // Cookie 选项
-  autoSave?: boolean;                   // 是否自动保存 Session（默认：true）
-  genId?: () => string;                 // Session ID 生成函数（可选）
+  store: SessionStore; // Session 存储适配器（必须）
+  name?: string; // Cookie 名称（默认：sessionId）
+  maxAge?: number; // Session 过期时间（毫秒，默认：86400000，24 小时）
+  cookie?: CookieOptions; // Cookie 选项
+  autoSave?: boolean; // 是否自动保存 Session（默认：true）
+  genId?: () => string; // Session ID 生成函数（可选）
 }
 
 interface CookieOptions {
-  maxAge?: number;                      // 过期时间（毫秒）
-  expires?: Date;                       // 过期日期
-  domain?: string;                      // 域名
-  path?: string;                        // 路径（默认：/）
-  secure?: boolean;                     // 是否只在 HTTPS 下发送
-  httpOnly?: boolean;                   // 是否禁止 JavaScript 访问
+  maxAge?: number; // 过期时间（毫秒）
+  expires?: Date; // 过期日期
+  domain?: string; // 域名
+  path?: string; // 路径（默认：/）
+  secure?: boolean; // 是否只在 HTTPS 下发送
+  httpOnly?: boolean; // 是否禁止 JavaScript 访问
   sameSite?: "strict" | "lax" | "none"; // SameSite 策略
 }
 ```
 
 **示例**：
+
 ```typescript
 app.use(session({
   store: new RedisSessionAdapter({ connection: { host: "127.0.0.1" } }),
@@ -426,13 +443,23 @@ app.use(session({
 手动管理 Session 的类，不依赖 HTTP 中间件。
 
 **方法**：
-- `create(data: SessionData): Promise<string>`: 创建新的 Session，返回 session ID
-- `get(sessionId: string): Promise<SessionData | null>`: 获取 Session 数据
-- `update(sessionId: string, data: SessionData): Promise<void>`: 更新 Session 数据
-- `delete(sessionId: string): Promise<void>`: 删除 Session
-- `has(sessionId: string): Promise<boolean>`: 检查 Session 是否存在
+
+| 方法                                     | 说明                               |
+| ---------------------------------------- | ---------------------------------- |
+| `create(data)`                           | 创建新的 Session，返回 session ID  |
+| `get(sessionId)`                         | 获取 Session 数据                  |
+| `update(sessionId, data)`                | 更新 Session 数据                  |
+| `delete(sessionId)`                      | 删除 Session                       |
+| `has(sessionId)`                         | 检查 Session 是否存在              |
+| `getName()`                              | 获取管理器名称                     |
+| `setContainer(container)`                | 设置服务容器                       |
+| `getContainer()`                         | 获取服务容器                       |
+| `getCookieName()`                        | 获取 Cookie 名称                   |
+| `getStore()`                             | 获取存储适配器                     |
+| `static fromContainer(container, name?)` | 从服务容器获取 SessionManager 实例 |
 
 **示例**：
+
 ```typescript
 const manager = new SessionManager({
   store: new RedisSessionAdapter({ connection: { host: "127.0.0.1" } }),
@@ -452,6 +479,57 @@ await manager.update(sessionId, { userId: 456 });
 await manager.delete(sessionId);
 ```
 
+### createSessionManager 工厂函数
+
+用于服务容器注册的工厂函数。
+
+```typescript
+import { createSessionManager, FileSessionAdapter } from "jsr:@dreamer/session";
+import { ServiceContainer } from "jsr:@dreamer/service";
+
+const container = new ServiceContainer();
+
+// 注册 SessionManager
+container.registerSingleton("session:default", () =>
+  createSessionManager({
+    store: new FileSessionAdapter({ sessionDir: "./sessions" }),
+    name: "default",
+  }));
+
+// 获取实例
+const manager = container.get<SessionManager>("session:default");
+```
+
+### ServiceContainer 集成示例
+
+```typescript
+import {
+  createSessionManager,
+  FileSessionAdapter,
+  SessionManager,
+} from "jsr:@dreamer/session";
+import { ServiceContainer } from "jsr:@dreamer/service";
+
+// 创建服务容器
+const container = new ServiceContainer();
+
+// 创建存储适配器
+const store = new FileSessionAdapter({ sessionDir: "./sessions" });
+
+// 注册 SessionManager 到服务容器
+container.registerSingleton("session:main", () => {
+  const manager = createSessionManager({ store, name: "main" });
+  manager.setContainer(container);
+  return manager;
+});
+
+// 从服务容器获取
+const manager = container.get<SessionManager>("session:main");
+
+// 或者使用静态方法
+const sameManager = SessionManager.fromContainer(container, "main");
+```
+
 ---
 
 ## ⚡ 性能优化
@@ -464,14 +542,33 @@ await manager.delete(sessionId);
 
 ---
 
+## 📊 测试报告
+
+[![Tests: 28 passed](https://img.shields.io/badge/Tests-28%20passed-brightgreen)](./TEST_REPORT.md)
+
+| 测试类别                      | 测试数 | 状态        |
+| ----------------------------- | ------ | ----------- |
+| FileSessionAdapter            | 4      | ✅ 通过     |
+| SessionManager                | 4      | ✅ 通过     |
+| Session 中间件                | 3      | ✅ 通过     |
+| ServiceContainer 集成         | 7      | ✅ 通过     |
+| createSessionManager 工厂函数 | 5      | ✅ 通过     |
+| **总计**                      | **28** | ✅ **100%** |
+
+详细测试报告请查看 [TEST_REPORT.md](./TEST_REPORT.md)。
+
+---
+
 ## 📝 注意事项
 
-1. **持久化存储**：本库只支持持久化存储（Redis、MongoDB、文件），不支持内存存储，确保 Session 数据持久化
+1. **持久化存储**：本库只支持持久化存储（Redis、MongoDB、文件），不支持内存存储，确保
+   Session 数据持久化
 2. **自动过期**：Session 会自动过期，过期时间由 `maxAge` 配置
 3. **Cookie 集成**：Session ID 通过 Cookie 传递，需要 HTTP 库支持 Cookie 功能
 4. **存储适配器**：必须提供存储适配器，不能为空
 5. **Session ID 生成**：默认使用 `@dreamer/crypto` 库生成安全的随机 Session ID
-6. **文件适配器清理**：文件适配器会启动定期清理定时器，测试时需要调用 `stopCleanup()` 停止定时器
+6. **文件适配器清理**：文件适配器会启动定期清理定时器，测试时需要调用
+   `stopCleanup()` 停止定时器
 
 ---
 

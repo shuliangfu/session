@@ -3,6 +3,7 @@
  */
 
 import { makeTempDir, remove } from "@dreamer/runtime-adapter";
+import { ServiceContainer } from "@dreamer/service";
 import {
   afterAll,
   afterEach,
@@ -12,6 +13,7 @@ import {
   it,
 } from "@dreamer/test";
 import {
+  createSessionManager,
   FileSessionAdapter,
   type HttpContext,
   session,
@@ -279,6 +281,169 @@ describe("@dreamer/session", () => {
         const saved = await adapter.get(cookieValue);
         expect(saved).toEqual({ userId: 123 });
       }
+    });
+  });
+
+  describe("SessionManager ServiceContainer 集成", () => {
+    let sessionDir: string;
+    const adapters: FileSessionAdapter[] = [];
+
+    beforeAll(async () => {
+      sessionDir = await makeTempDir({ prefix: "session-test-" });
+    });
+
+    afterEach(() => {
+      for (const adapter of adapters) {
+        adapter.stopCleanup();
+      }
+      adapters.length = 0;
+    });
+
+    afterAll(async () => {
+      try {
+        await remove(sessionDir, { recursive: true });
+      } catch {
+        // 忽略错误
+      }
+    });
+
+    it("应该获取默认管理器名称", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = new SessionManager({ store: adapter });
+
+      expect(manager.getName()).toBe("default");
+    });
+
+    it("应该获取自定义管理器名称", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = new SessionManager({ store: adapter, name: "custom" });
+
+      expect(manager.getName()).toBe("custom");
+    });
+
+    it("应该设置和获取服务容器", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = new SessionManager({ store: adapter });
+      const container = new ServiceContainer();
+
+      expect(manager.getContainer()).toBeUndefined();
+
+      manager.setContainer(container);
+      expect(manager.getContainer()).toBe(container);
+    });
+
+    it("应该从服务容器获取 SessionManager", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const container = new ServiceContainer();
+      const manager = new SessionManager({ store: adapter, name: "test" });
+      manager.setContainer(container);
+
+      container.registerSingleton("session:test", () => manager);
+
+      const retrieved = SessionManager.fromContainer(container, "test");
+      expect(retrieved).toBe(manager);
+    });
+
+    it("应该在服务不存在时返回 undefined", () => {
+      const container = new ServiceContainer();
+      const retrieved = SessionManager.fromContainer(container, "non-existent");
+      expect(retrieved).toBeUndefined();
+    });
+
+    it("应该获取 Cookie 名称", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = new SessionManager({ store: adapter, name: "mySession" });
+
+      expect(manager.getCookieName()).toBe("mySession");
+    });
+
+    it("应该获取存储适配器", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = new SessionManager({ store: adapter });
+
+      expect(manager.getStore()).toBe(adapter);
+    });
+  });
+
+  describe("createSessionManager 工厂函数", () => {
+    let sessionDir: string;
+    const adapters: FileSessionAdapter[] = [];
+
+    beforeAll(async () => {
+      sessionDir = await makeTempDir({ prefix: "session-test-" });
+    });
+
+    afterEach(() => {
+      for (const adapter of adapters) {
+        adapter.stopCleanup();
+      }
+      adapters.length = 0;
+    });
+
+    afterAll(async () => {
+      try {
+        await remove(sessionDir, { recursive: true });
+      } catch {
+        // 忽略错误
+      }
+    });
+
+    it("应该创建 SessionManager 实例", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = createSessionManager({ store: adapter });
+
+      expect(manager).toBeInstanceOf(SessionManager);
+    });
+
+    it("应该使用默认名称", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = createSessionManager({ store: adapter });
+
+      expect(manager.getName()).toBe("default");
+    });
+
+    it("应该使用自定义名称", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = createSessionManager({ store: adapter, name: "custom" });
+
+      expect(manager.getName()).toBe("custom");
+    });
+
+    it("应该能够在服务容器中注册", () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const container = new ServiceContainer();
+
+      container.registerSingleton(
+        "session:main",
+        () => createSessionManager({ store: adapter, name: "main" }),
+      );
+
+      const manager = container.get<SessionManager>("session:main");
+      expect(manager).toBeInstanceOf(SessionManager);
+      expect(manager.getName()).toBe("main");
+    });
+
+    it("应该支持创建和管理 Session", async () => {
+      const adapter = new FileSessionAdapter({ sessionDir });
+      adapters.push(adapter);
+      const manager = createSessionManager({ store: adapter });
+
+      const data = { userId: 123 };
+      const sessionId = await manager.create(data);
+
+      expect(sessionId).toBeTruthy();
+      const retrieved = await manager.get(sessionId);
+      expect(retrieved).toEqual(data);
     });
   });
 });

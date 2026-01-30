@@ -14,7 +14,7 @@ import type { SessionData } from "./adapters/types.ts";
  *
  * 注意：这要求 HTTP 库已经定义了 HttpContext 接口并导出。
  */
-declare module "jsr:@dreamer/server" {
+declare module "@dreamer/server" {
   interface HttpContext {
     /** Session 数据（由 Session 中间件添加） */
     session?: SessionData;

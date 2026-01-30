@@ -47,6 +47,7 @@
 
 import { generateRandomBytes } from "@dreamer/crypto";
 import type { SessionData, SessionStore } from "./adapters/types.ts";
+import type { ServiceContainer } from "@dreamer/service";
 
 /**
  * Cookie 选项
@@ -193,24 +194,86 @@ export function session(
 }
 
 /**
+ * Session 管理器扩展选项
+ * 包含服务容器集成相关配置
+ */
+export interface SessionManagerOptions extends SessionOptions {
+  /** 管理器名称（用于服务容器识别） */
+  name?: string;
+}
+
+/**
  * Session 管理器
  * 提供手动管理 Session 的 API
  */
 export class SessionManager {
+  /** Session 存储适配器 */
   private store: SessionStore;
-  private name: string;
+  /** Cookie 名称 */
+  private cookieName: string;
+  /** Session 过期时间 */
   private maxAge: number;
+  /** Session ID 生成函数 */
   private genId: () => string;
+  /** 服务容器实例 */
+  private container?: ServiceContainer;
+  /** 管理器名称 */
+  private readonly managerName: string;
 
-  constructor(options: SessionOptions) {
+  /**
+   * 创建 SessionManager 实例
+   * @param options Session 管理器配置选项
+   */
+  constructor(options: SessionManagerOptions) {
     this.store = options.store;
-    this.name = options.name || "sessionId";
+    this.cookieName = options.name || "sessionId";
     this.maxAge = options.maxAge || 86400000;
     this.genId = options.genId || generateSessionId;
+    this.managerName = options.name || "default";
+  }
+
+  /**
+   * 获取管理器名称
+   * @returns 管理器名称
+   */
+  getName(): string {
+    return this.managerName;
+  }
+
+  /**
+   * 设置服务容器
+   * @param container 服务容器实例
+   */
+  setContainer(container: ServiceContainer): void {
+    this.container = container;
+  }
+
+  /**
+   * 获取服务容器
+   * @returns 服务容器实例，如果未设置则返回 undefined
+   */
+  getContainer(): ServiceContainer | undefined {
+    return this.container;
+  }
+
+  /**
+   * 从服务容器创建 SessionManager 实例
+   * @param container 服务容器实例
+   * @param name 管理器名称（默认 "default"）
+   * @returns 关联了服务容器的 SessionManager 实例
+   */
+  static fromContainer(
+    container: ServiceContainer,
+    name = "default",
+  ): SessionManager | undefined {
+    const serviceName = `session:${name}`;
+    return container.tryGet<SessionManager>(serviceName);
   }
 
   /**
    * 创建新的 Session
+   * @param data Session 数据
+   * @returns Session ID
    */
   async create(data: SessionData): Promise<string> {
     const sessionId = this.genId();
@@ -220,6 +283,8 @@ export class SessionManager {
 
   /**
    * 获取 Session 数据
+   * @param sessionId Session ID
+   * @returns Session 数据，如果不存在则返回 null
    */
   async get(sessionId: string): Promise<SessionData | null> {
     return await this.store.get(sessionId);
@@ -227,6 +292,8 @@ export class SessionManager {
 
   /**
    * 更新 Session 数据
+   * @param sessionId Session ID
+   * @param data Session 数据
    */
   async update(sessionId: string, data: SessionData): Promise<void> {
     await this.store.set(sessionId, data, this.maxAge);
@@ -234,6 +301,7 @@ export class SessionManager {
 
   /**
    * 删除 Session
+   * @param sessionId Session ID
    */
   async delete(sessionId: string): Promise<void> {
     await this.store.delete(sessionId);
@@ -241,10 +309,40 @@ export class SessionManager {
 
   /**
    * 检查 Session 是否存在
+   * @param sessionId Session ID
+   * @returns 是否存在
    */
   async has(sessionId: string): Promise<boolean> {
     return await this.store.has(sessionId);
   }
+
+  /**
+   * 获取 Cookie 名称
+   * @returns Cookie 名称
+   */
+  getCookieName(): string {
+    return this.cookieName;
+  }
+
+  /**
+   * 获取存储适配器
+   * @returns Session 存储适配器
+   */
+  getStore(): SessionStore {
+    return this.store;
+  }
+}
+
+/**
+ * 创建 SessionManager 的工厂函数
+ * 用于服务容器注册
+ * @param options Session 管理器配置选项
+ * @returns SessionManager 实例
+ */
+export function createSessionManager(
+  options: SessionManagerOptions,
+): SessionManager {
+  return new SessionManager(options);
 }
 
 // 导出适配器
