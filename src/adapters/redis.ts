@@ -4,6 +4,7 @@
  * @fileoverview Redis Session 存储适配器
  */
 
+import { createClient } from "redis";
 import type { SessionData, SessionStore } from "./types.ts";
 
 /**
@@ -96,9 +97,6 @@ export class RedisSessionAdapter implements SessionStore {
    */
   async connect(): Promise<void> {
     if (this.connectionConfig && !this.internalClient) {
-      // 动态导入 redis 包
-      const { createClient } = await import("redis");
-
       const config = this.connectionConfig;
       const redisUrl = config.url ||
         `redis://${config.host || "127.0.0.1"}:${config.port || 6379}`;

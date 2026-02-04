@@ -4,6 +4,7 @@
  * @fileoverview MongoDB Session 存储适配器
  */
 
+import { MongoClient } from "mongodb";
 import type { SessionData, SessionStore } from "./types.ts";
 
 /**
@@ -110,9 +111,6 @@ export class MongoDBSessionAdapter implements SessionStore {
    */
   async connect(): Promise<void> {
     if (this.connectionConfig && !this.internalClient) {
-      // 动态导入 mongodb 包
-      const { MongoClient } = await import("mongodb");
-
       const config = this.connectionConfig;
       let mongoUrl: string;
 
