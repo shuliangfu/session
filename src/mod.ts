@@ -124,6 +124,35 @@ function generateSessionId(): string {
 }
 
 /**
+ * 按 sessionId 的进程内写锁
+ * 保证同一客户端（同一 sessionId）在同一时刻只有一个请求执行 session 写入，
+ * 避免页面刷新时多个静态资源请求并发写同一 session 造成覆盖或重复写入。
+ */
+const sessionWriteLocks = new Map<string, Promise<void>>();
+
+/**
+ * 在指定 sessionId 的写锁下执行 fn，执行完后释放锁
+ */
+async function withSessionWriteLock(
+  sessionId: string,
+  fn: () => Promise<void>,
+): Promise<void> {
+  const prev = sessionWriteLocks.get(sessionId) ?? Promise.resolve();
+  let release!: () => void;
+  const myLock = new Promise<void>((r) => {
+    release = r;
+  });
+  const chain = prev.then(() => myLock);
+  sessionWriteLocks.set(sessionId, chain);
+  await prev;
+  try {
+    await fn();
+  } finally {
+    release();
+  }
+}
+
+/**
  * Session 中间件
  * 用于与 HTTP 库集成，自动管理 Session
  */
@@ -166,29 +195,26 @@ export function session(
     // 执行下一个中间件
     await next();
 
-    // 自动保存 session（如果启用）
+    // 自动保存 session（如果启用）：同一 sessionId 串行写入，避免并发覆盖
     if (autoSave && ctx.session) {
-      // 检查 session 是否有数据
       const hasData = Object.keys(ctx.session).length > 0;
 
-      if (hasData) {
-        // 保存 session 数据
-        await store.set(sessionId, ctx.session, maxAge);
-
-        // 设置 Cookie
-        ctx.cookies.set(name, sessionId, {
-          maxAge,
-          httpOnly: true,
-          path: "/",
-          ...cookieOptions,
-        });
-      } else {
-        // 如果 session 为空，删除它
-        if (sessionId) {
-          await store.delete(sessionId);
+      await withSessionWriteLock(sessionId, async () => {
+        if (hasData) {
+          await store.set(sessionId, ctx.session!, maxAge);
+          ctx.cookies.set(name, sessionId, {
+            maxAge,
+            httpOnly: true,
+            path: "/",
+            ...cookieOptions,
+          });
+        } else {
+          if (sessionId) {
+            await store.delete(sessionId);
+          }
+          ctx.cookies.remove(name);
         }
-        ctx.cookies.remove(name);
-      }
+      });
     }
   };
 }
