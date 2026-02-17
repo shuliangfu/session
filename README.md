@@ -14,15 +14,12 @@
 
 ## 📋 Changelog
 
-### [1.0.0] - 2026-02-16
+See [en-US](./docs/en-US/CHANGELOG.md) | [zh-CN](./docs/zh-CN/CHANGELOG.md) for
+full history.
 
-**Added**: Redis, MongoDB, and File session storage adapters; session middleware
-for HTTP integration; SessionManager and `createSessionManager` factory with
-service container support; per-sessionId in-process write lock to avoid
-concurrent overwrites when multiple requests share the same session cookie.
-
-Full changelog: [en-US](./docs/en-US/CHANGELOG.md) |
-[zh-CN](./docs/zh-CN/CHANGELOG.md)
+**Latest (v1.0.1)**: i18n for adapter errors and file cleanup log; `$t`,
+`initSessionI18n`, `setSessionLocale`, `Locale`; en-US/zh-CN locales; locale
+auto-detected from env.
 
 ---
 

@@ -13,6 +13,7 @@ import {
   stat,
   writeTextFile,
 } from "@dreamer/runtime-adapter";
+import { $t } from "../i18n.ts";
 import type { SessionData, SessionStore } from "./types.ts";
 
 /**
@@ -124,8 +125,8 @@ export class FileSessionAdapter implements SessionStore {
         }
       }
     } catch (error) {
-      // 忽略清理错误
-      console.error("Session 清理错误:", error);
+      // 忽略清理错误，仅输出翻译后的标签
+      console.error($t("session.file.cleanupError") + ":", error);
     }
   }
 

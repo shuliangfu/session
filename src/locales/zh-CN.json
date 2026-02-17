@@ -1,0 +1,15 @@
+{
+  "session": {
+    "redis": {
+      "needConnectionOrClient": "RedisSessionAdapter 需要提供 connection 配置或 client 实例",
+      "clearNotSupported": "RedisSessionAdapter 不支持 clear() 方法"
+    },
+    "mongodb": {
+      "needDatabaseWithClient": "MongoDBSessionAdapter 使用 client 时需要提供 database 选项",
+      "needConnectionOrClient": "MongoDBSessionAdapter 需要提供 connection 配置或 client 实例"
+    },
+    "file": {
+      "cleanupError": "Session 清理错误"
+    }
+  }
+}

@@ -10,6 +10,21 @@ and this project adheres to
 
 ---
 
+## [1.0.1] - 2026-02-18
+
+### Added
+
+- **i18n**: Adapter error messages and file cleanup log message are localized.
+  - New `@dreamer/i18n` dependency; `src/i18n.ts` and `src/locales/en-US.json` /
+    `zh-CN.json`.
+  - Redis: "need connection or client", "clear() not supported".
+  - MongoDB: "need database when using client", "need connection or client".
+  - File: "Session cleanup error" label.
+- Exports: `$t`, `initSessionI18n`, `setSessionLocale`, type `Locale`. Locale is
+  auto-detected from `LANGUAGE` / `LC_ALL` / `LANG` when not set.
+
+---
+
 ## [1.0.0] - 2026-02-16
 
 ### Added

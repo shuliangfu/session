@@ -9,6 +9,21 @@
 
 ---
 
+## [1.0.1] - 2026-02-18
+
+### 新增
+
+- **i18n**：适配器错误信息与文件清理日志支持多语言。
+  - 新增依赖 `@dreamer/i18n`；`src/i18n.ts` 与 `src/locales/en-US.json` /
+    `zh-CN.json`。
+  - Redis：「需要 connection 或 client」、「不支持 clear()」。
+  - MongoDB：「使用 client 时需提供 database」、「需要 connection 或 client」。
+  - 文件：「Session 清理错误」标签。
+- 导出：`$t`、`initSessionI18n`、`setSessionLocale`、类型 `Locale`。未设置时
+  从环境变量 `LANGUAGE` / `LC_ALL` / `LANG` 自动检测语言。
+
+---
+
 ## [1.0.0] - 2026-02-16
 
 ### 新增
