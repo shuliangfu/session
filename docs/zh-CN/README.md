@@ -273,13 +273,11 @@ interface SessionOptions {
 
 ## 📋 变更日志
 
-### [1.0.0] - 2026-02-16
+完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**新增**：Redis、MongoDB、文件三种 Session 存储适配器；Session 中间件与 HTTP
-集成；SessionManager 及 `createSessionManager` 工厂、服务容器集成；按 sessionId
-的进程内写锁，避免多请求共持同一 session cookie 时的并发覆盖。
-
-完整变更日志：[CHANGELOG.md](./CHANGELOG.md)
+**最新 (v1.0.1)**：适配器错误与文件清理日志
+i18n；`$t`、`initSessionI18n`、`setSessionLocale`、`Locale`；en-US/zh-CN
+文案；语言由环境变量自动检测。
 
 ---
 

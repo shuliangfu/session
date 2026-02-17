@@ -5,6 +5,7 @@
  */
 
 import { createClient } from "redis";
+import { $t } from "../i18n.ts";
 import type { SessionData, SessionStore } from "./types.ts";
 
 /**
@@ -86,9 +87,7 @@ export class RedisSessionAdapter implements SessionStore {
       this.client = options.client;
       this.keyPrefix = options.keyPrefix || "session";
     } else {
-      throw new Error(
-        "RedisSessionAdapter 需要提供 connection 配置或 client 实例",
-      );
+      throw new Error($t("session.redis.needConnectionOrClient"));
     }
   }
 
@@ -195,7 +194,7 @@ export class RedisSessionAdapter implements SessionStore {
   clear(): Promise<void> {
     // Redis 不支持直接清空所有 session，需要遍历删除
     // 这里不实现，因为性能问题
-    return Promise.reject(new Error("RedisSessionAdapter 不支持 clear() 方法"));
+    return Promise.reject(new Error($t("session.redis.clearNotSupported")));
   }
 
   /**
