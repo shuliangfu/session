@@ -275,9 +275,8 @@ interface SessionOptions {
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**最新 (v1.0.1)**：适配器错误与文件清理日志
-i18n；`$t`、`initSessionI18n`、`setSessionLocale`、`Locale`；en-US/zh-CN
-文案；语言由环境变量自动检测。
+**最新 (v1.0.2 - 2026-02-19)**：**变更** – i18n `$t` → `$tr`。详见
+[CHANGELOG](./CHANGELOG.md)。
 
 ---
 

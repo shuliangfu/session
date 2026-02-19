@@ -17,9 +17,8 @@
 See [en-US](./docs/en-US/CHANGELOG.md) | [zh-CN](./docs/zh-CN/CHANGELOG.md) for
 full history.
 
-**Latest (v1.0.1)**: i18n for adapter errors and file cleanup log; `$t`,
-`initSessionI18n`, `setSessionLocale`, `Locale`; en-US/zh-CN locales; locale
-auto-detected from env.
+**Latest (v1.0.2 - 2026-02-19)**: **Changed** – i18n `$t` → `$tr`. See
+[CHANGELOG](./docs/en-US/CHANGELOG.md).
 
 ---
 

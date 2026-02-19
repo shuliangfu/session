@@ -5,7 +5,7 @@
  */
 
 import { MongoClient } from "mongodb";
-import { $t } from "../i18n.ts";
+import { $tr } from "../i18n.ts";
 import type { SessionData, SessionStore } from "./types.ts";
 
 /**
@@ -96,10 +96,10 @@ export class MongoDBSessionAdapter implements SessionStore {
       if (options.database) {
         this.databaseName = options.database;
       } else {
-        throw new Error($t("session.mongodb.needDatabaseWithClient"));
+        throw new Error($tr("session.mongodb.needDatabaseWithClient"));
       }
     } else {
-      throw new Error($t("session.mongodb.needConnectionOrClient"));
+      throw new Error($tr("session.mongodb.needConnectionOrClient"));
     }
   }
 
