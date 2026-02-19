@@ -393,8 +393,7 @@ export type {
   SessionStore,
 } from "./adapters/mod.ts";
 
-// i18n：适配器错误信息等文案翻译，可按需 init 或使用默认入口初始化
-export { $t, initSessionI18n, type Locale, setSessionLocale } from "./i18n.ts";
+// i18n 仅包内使用，不对外导出；测试需 init/setLocale 时从 ./i18n.ts 导入
 
 // 导出类型定义（模块增强会自动生效）
 // 注意：types.d.ts 中的模块增强会在导入时自动生效
