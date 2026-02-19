@@ -52,10 +52,8 @@ export function detectLocale(): Locale {
   return DEFAULT_LOCALE;
 }
 
-/**
- * 加载文案并设置当前 locale。在入口（如 mod）中调用一次即可。
- */
-export function initSessionI18n(): void {
+/** 内部初始化，导入 i18n 时自动执行，不导出 */
+function initSessionI18n(): void {
   if (sessionI18n) return;
   const i18n = createI18n({
     defaultLocale: DEFAULT_LOCALE,
@@ -66,6 +64,8 @@ export function initSessionI18n(): void {
   i18n.setLocale(detectLocale());
   sessionI18n = i18n;
 }
+
+initSessionI18n();
 
 /**
  * 设置当前语言（供配置 options.lang 使用）。
@@ -83,6 +83,7 @@ export function $tr(
   params?: TranslationParams,
   lang?: Locale,
 ): string {
+  if (!sessionI18n) initSessionI18n();
   if (!sessionI18n) return key;
   if (lang !== undefined) {
     const prev = sessionI18n.getLocale();

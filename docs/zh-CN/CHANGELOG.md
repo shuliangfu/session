@@ -9,6 +9,17 @@
 
 ---
 
+## [1.0.3] - 2026-02-19
+
+### 变更
+
+- **i18n**：`initSessionI18n` 不再导出；i18n 在模块加载时自动初始化。请移除
+  代码中手动的 `initSessionI18n()` 调用。
+- **依赖**：`@dreamer/runtime-adapter` ^1.0.15、`@dreamer/service` ^1.0.2、
+  `@dreamer/crypto` ^1.0.1、`@dreamer/test` ^1.0.11。
+
+---
+
 ## [1.0.2] - 2026-02-19
 
 ### 变更

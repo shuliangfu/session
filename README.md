@@ -17,7 +17,8 @@
 See [en-US](./docs/en-US/CHANGELOG.md) | [zh-CN](./docs/zh-CN/CHANGELOG.md) for
 full history.
 
-**Latest (v1.0.2 - 2026-02-19)**: **Changed** – i18n `$t` → `$tr`. See
+**Latest (v1.0.3 - 2026-02-19)**: **Changed** – i18n `initSessionI18n` no longer
+exported (auto-init on load); dependency bumps. See
 [CHANGELOG](./docs/en-US/CHANGELOG.md).
 
 ---
