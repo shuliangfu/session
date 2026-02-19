@@ -10,6 +10,17 @@ and this project adheres to
 
 ---
 
+## [1.0.3] - 2026-02-19
+
+### Changed
+
+- **i18n**: `initSessionI18n` is no longer exported; i18n initializes on module
+  load. Remove any manual `initSessionI18n()` calls from your code.
+- **Dependencies**: `@dreamer/runtime-adapter` ^1.0.15, `@dreamer/service`
+  ^1.0.2, `@dreamer/crypto` ^1.0.1, `@dreamer/test` ^1.0.11.
+
+---
+
 ## [1.0.2] - 2026-02-19
 
 ### Changed

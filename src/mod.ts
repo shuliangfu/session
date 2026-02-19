@@ -46,12 +46,8 @@
  */
 
 import { generateRandomBytes } from "@dreamer/crypto";
-import { initSessionI18n } from "./i18n.ts";
 import type { SessionData, SessionStore } from "./adapters/types.ts";
 import type { ServiceContainer } from "@dreamer/service";
-
-// 入口处初始化 i18n，供适配器错误信息等文案使用
-initSessionI18n();
 
 /**
  * Cookie 选项
@@ -393,7 +389,7 @@ export type {
   SessionStore,
 } from "./adapters/mod.ts";
 
-// i18n 仅包内使用，不对外导出；测试需 init/setLocale 时从 ./i18n.ts 导入
+// i18n 仅包内使用，不对外导出；测试需 setLocale 时从 ./i18n.ts 导入
 
 // 导出类型定义（模块增强会自动生效）
 // 注意：types.d.ts 中的模块增强会在导入时自动生效

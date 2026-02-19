@@ -275,7 +275,8 @@ interface SessionOptions {
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**最新 (v1.0.2 - 2026-02-19)**：**变更** – i18n `$t` → `$tr`。详见
+**最新 (v1.0.3 - 2026-02-19)**：**变更** – i18n `initSessionI18n`
+不再导出（模块加载时自动初始化）；依赖版本更新。详见
 [CHANGELOG](./CHANGELOG.md)。
 
 ---
