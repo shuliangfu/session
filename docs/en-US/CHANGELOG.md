@@ -1,3 +1,11 @@
+## [1.0.4] - 2026-02-20
+
+### Changed
+
+- Dependencies: bump @dreamer/crypto, @dreamer/test.
+
+---
+
 # Changelog
 
 [English](./CHANGELOG.md) | [中文 (Chinese)](../zh-CN/CHANGELOG.md)

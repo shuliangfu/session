@@ -1,3 +1,11 @@
+## [1.0.4] - 2026-02-20
+
+### 变更
+
+- 依赖：bump @dreamer/crypto、@dreamer/test。
+
+---
+
 # 变更日志
 
 [English](../en-US/CHANGELOG.md) | 中文 (Chinese)
