@@ -4,7 +4,6 @@
  * @fileoverview MongoDB Session 存储适配器
  */
 
-import { MongoClient } from "mongodb";
 import { $tr } from "../i18n.ts";
 import type { SessionData, SessionStore } from "./types.ts";
 
@@ -125,6 +124,10 @@ export class MongoDBSessionAdapter implements SessionStore {
         }
       }
 
+      // 【Why】懒加载 mongodb 包：顶层 import 会经 adapters/mod.ts 静态 re-export
+      // 触发 eager 加载，导致 `import { session }` 也强载 mongodb npm 包（Bun 模块
+      // 加载失败、Node 无谓安装）。移入 connect() 内动态 import，仅实际连接时加载。
+      const { MongoClient } = await import("mongodb");
       this.internalClient = new MongoClient(mongoUrl);
       await this.internalClient.connect();
       this.client = this.internalClient;

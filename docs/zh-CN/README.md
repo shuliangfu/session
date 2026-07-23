@@ -1,9 +1,9 @@
 # @dreamer/session
 
-> [English](../en-US/README.md) | 中文 (Chinese)
+> [English](../../README.md) | 中文 (Chinese)
 
-> 一个兼容 Deno 和 Bun 的持久化 Session 会话管理库，提供统一的 Session
-> 管理接口，支持多种存储后端（Redis、MongoDB、文件）
+> 一个兼容 Deno、Bun、Node.js 22+ 的持久化 Session 会话管理库，提供统一的
+> Session 管理接口，支持多种存储后端（Redis、MongoDB、文件）
 
 ---
 
@@ -50,7 +50,7 @@
 
 __所有 @dreamer/_ 库都遵循以下原则_*：
 
-- **主包（@dreamer/xxx）**：用于服务端（兼容 Deno 和 Bun 运行时）
+- **主包（@dreamer/xxx）**：用于服务端（兼容 Deno、Bun、Node.js 22+ 运行时）
 - **客户端子包（@dreamer/xxx/client）**：用于客户端（浏览器环境）
 
 这样可以：
@@ -88,18 +88,25 @@ deno add jsr:@dreamer/session
 bunx jsr add @dreamer/session
 ```
 
+### Node.js 22+
+
+```bash
+npx jsr add @dreamer/session
+```
+
 ---
 
 ## 🌍 环境兼容性
 
 | 环境         | 版本要求                             | 状态                                                              |
 | ------------ | ------------------------------------ | ----------------------------------------------------------------- |
-| **Deno**     | 2.5+                                 | ✅ 完全支持                                                       |
-| **Bun**      | 1.0+                                 | ✅ 完全支持                                                       |
-| **服务端**   | -                                    | ✅ 支持（兼容 Deno 和 Bun 运行时，支持 Redis、MongoDB、文件存储） |
+| **Deno**     | 2.9+                                 | ✅ 完全支持                                                       |
+| **Bun**      | 1.3+                                 | ✅ 完全支持                                                       |
+| **Node.js**  | 22+                                  | ✅ 完全支持                                                       |
+| **服务端**   | -                                    | ✅ 支持（兼容 Deno、Bun、Node.js，支持 Redis、MongoDB、文件存储） |
 | **客户端**   | -                                    | ❌ 不支持（纯服务端库）                                           |
-| **依赖**     | `redis@^5.10.0`, `mongodb@^6.10.0`   | 📦 用于 Redis 和 MongoDB 适配器（可选）                           |
-| **可选依赖** | `jsr:@dreamer/service@^1.0.0-beta.4` | 📦 用于服务容器集成（可选）                                       |
+| **依赖**     | `redis@^5.11.0`, `mongodb@^7.0.0`    | 📦 用于 Redis 和 MongoDB 适配器（按需懒加载）                     |
+| **可选依赖** | `jsr:@dreamer/service@^1.1.0`        | 📦 用于服务容器集成（可选）                                       |
 
 ---
 
@@ -265,9 +272,10 @@ interface SessionOptions {
 | Session 中间件                | 3      | ✅ 通过     |
 | ServiceContainer 集成         | 7      | ✅ 通过     |
 | createSessionManager 工厂函数 | 5      | ✅ 通过     |
-| **总计**                      | **28** | ✅ **100%** |
+| **总计**                      | **23** | ✅ **100%** |
 
-详细报告见 [TEST_REPORT.md](./TEST_REPORT.md)。
+> 三端（Deno / Bun / Node.js 22+）全部通过，详见
+> [TEST_REPORT.md](./TEST_REPORT.md)。
 
 ---
 
@@ -275,8 +283,9 @@ interface SessionOptions {
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**最新 (v1.0.3 - 2026-02-19)**：**变更** – i18n `initSessionI18n`
-不再导出（模块加载时自动初始化）；依赖版本更新。详见
+**最新 (v1.1.0 - 2026-07-23)**：**新增** – Node.js 22+ 兼容。**变更** –
+Redis/MongoDB 适配器改为在 `connect()` 内懒加载 npm 包；依赖升级
+（`@dreamer/runtime-adapter` ^1.2.2 等）。详见
 [CHANGELOG](./CHANGELOG.md)。
 
 ---

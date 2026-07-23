@@ -4,12 +4,12 @@
 
 | Item               | Value                                    |
 | ------------------ | ---------------------------------------- |
-| **Package**        | `@dreamer/session@1.0.0-beta.3`          |
-| **Service**        | `@dreamer/service@1.0.0-beta.4`          |
-| **Runtime**        | `@dreamer/runtime-adapter@1.0.0-beta.22` |
-| **Test framework** | `@dreamer/test@1.0.0-beta.39`            |
-| **Date**           | 2026-01-30                               |
-| **Environment**    | Deno 2.5+, Bun 1.0+                      |
+| **Package**        | `@dreamer/session@1.1.0`                 |
+| **Service**        | `@dreamer/service@^1.1.0`                |
+| **Runtime**        | `@dreamer/runtime-adapter@^1.2.2`        |
+| **Test framework** | `@dreamer/test@^1.2.3`                   |
+| **Date**           | 2026-07-23                               |
+| **Environment**    | Deno 2.9+, Bun 1.3+, Node.js 22+         |
 
 ---
 
@@ -17,19 +17,23 @@
 
 ### Summary
 
-| Metric       | Value |
-| ------------ | ----- |
-| **Total**    | 28    |
-| **Passed**   | 28    |
-| **Failed**   | 0     |
-| **Rate**     | 100%  |
-| **Duration** | ~1.3s |
+| Metric       | Value                              |
+| ------------ | ---------------------------------- |
+| **Total**    | 23 unit tests (per runtime)        |
+| **Passed**   | Deno 29 / Bun 23 / Node 23         |
+| **Failed**   | 0                                  |
+| **Rate**     | 100%                               |
+| **Duration** | Deno ~1s / Bun ~1.1s / Node ~1.4s  |
+
+> Deno counts 6 additional lifecycle hooks (5 `describe` `afterAll` + 1
+> `@dreamer/test` cleanup) on top of the 23 unit tests; Bun and Node report 23
+> unit tests each.
 
 ### By file
 
 | File          | Count | Passed | Failed | Status  |
 | ------------- | ----- | ------ | ------ | ------- |
-| `mod.test.ts` | 28    | 28     | 0      | ✅ Pass |
+| `mod.test.ts` | 23    | 23     | 0      | ✅ Pass |
 
 ---
 
@@ -85,11 +89,24 @@
 
 ---
 
-## Conclusion
+## Cross-runtime notes
 
-All 28 tests pass. The package covers adapters (Redis, MongoDB, File),
-middleware, SessionManager, and service container integration.
+- **Deno**: `deno test --allow-all tests/*.test.ts`
+- **Bun**: `bun test tests/` (requires `bun install` first)
+- **Node.js 22+**: `npm run test:node` (`tsx --tsconfig tsconfig.json --test
+  --test-force-exit tests/*.test.ts`; requires `npm install` first)
+- Adapter tests use only `FileSessionAdapter` (filesystem via runtime-adapter);
+  no real Redis/MongoDB services or Chromium are required, so all 9 CI jobs run
+  without external services.
 
 ---
 
-**Pass rate: 100%** ✅ — 28 tests, all passed.
+## Conclusion
+
+All 23 unit tests pass on Deno, Bun, and Node.js 22+. The package covers adapters
+(Redis, MongoDB, File), middleware, SessionManager, and service container
+integration.
+
+---
+
+**Pass rate: 100%** ✅ — 23 tests, all passed across three runtimes.

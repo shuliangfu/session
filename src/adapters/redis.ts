@@ -4,7 +4,6 @@
  * @fileoverview Redis Session 存储适配器
  */
 
-import { createClient } from "redis";
 import { $tr } from "../i18n.ts";
 import type { SessionData, SessionStore } from "./types.ts";
 
@@ -100,6 +99,10 @@ export class RedisSessionAdapter implements SessionStore {
       const redisUrl = config.url ||
         `redis://${config.host || "127.0.0.1"}:${config.port || 6379}`;
 
+      // 【Why】懒加载 redis 包：顶层 import 会经 adapters/mod.ts 静态 re-export
+      // 触发 eager 加载，导致 `import { session }` 也强载 redis npm 包（Bun 模块
+      // 加载失败、Node 无谓安装）。移入 connect() 内动态 import，仅实际连接时加载。
+      const { createClient } = await import("redis");
       this.internalClient = createClient({
         url: redisUrl,
         password: config.password,

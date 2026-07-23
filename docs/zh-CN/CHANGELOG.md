@@ -1,3 +1,30 @@
+## [1.1.0] - 2026-07-23
+
+### 新增
+
+- **Node.js 22+ 兼容**：本包现已支持 Deno、Bun、Node.js 22+ 三端运行。安装：
+  `npx jsr add @dreamer/session`。
+- 新增 `test:node` 任务（`tsx --test --test-force-exit tests/*.test.ts`）与
+  9 作业跨平台 CI 矩阵（Deno 2.9 / Bun / Node 22 × Linux/macOS/Windows）。
+
+### 变更
+
+- **适配器懒加载**：`RedisSessionAdapter` 与 `MongoDBSessionAdapter` 改为在
+  `connect()` 内动态 `import("redis")` / `import("mongodb")`，不再顶层 `import`。
+  这避免 `import { session }` 经 adapters/mod.ts 静态 re-export 链 eager 加载
+  redis/mongodb npm 包（Bun 模块加载失败、Node 无谓安装），仅实际连接时加载。
+- **依赖**：`@dreamer/runtime-adapter` ^1.2.2、`@dreamer/i18n` ^1.1.2、
+  `@dreamer/service` ^1.1.0、`@dreamer/crypto` ^1.1.0、`@dreamer/test` ^1.2.3。
+- `publish.yml` 不再向 `jsr publish` 传 `--no-check`（类型已在 `deno check` 下
+  干净通过）。
+
+### 测试
+
+- 全部 23 个单元测试在 Deno、Bun、Node.js 22+ 三端通过（Deno 计 29 含 lifecycle
+  hook；Bun/Node 各计 23 个单元测试）。
+
+---
+
 ## [1.0.4] - 2026-02-20
 
 ### 变更

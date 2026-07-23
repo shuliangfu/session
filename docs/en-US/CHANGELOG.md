@@ -1,3 +1,31 @@
+## [1.1.0] - 2026-07-23
+
+### Added
+
+- **Node.js 22+ compatibility**: The package now runs on Deno, Bun, and Node.js
+  22+. Install with `npx jsr add @dreamer/session`.
+- New `test:node` task (`tsx --test --test-force-exit tests/*.test.ts`) and a
+  9-job cross-platform CI matrix (Deno 2.9 / Bun / Node 22 × Linux/macOS/Windows).
+
+### Changed
+
+- **Adapter lazy-loading**: `RedisSessionAdapter` and `MongoDBSessionAdapter` now
+  dynamically `import("redis")` / `import("mongodb")` inside `connect()` instead
+  of a top-level `import`. This prevents `import { session }` from eagerly
+  loading the `redis` / `mongodb` npm packages (Bun module-loading failures,
+  unnecessary Node installs); the packages load only on actual connection.
+- **Dependencies**: `@dreamer/runtime-adapter` ^1.2.2, `@dreamer/i18n` ^1.1.2,
+  `@dreamer/service` ^1.1.0, `@dreamer/crypto` ^1.1.0, `@dreamer/test` ^1.2.3.
+- `publish.yml` no longer passes `--no-check` to `jsr publish` (types now
+  type-check cleanly under `deno check`).
+
+### Tests
+
+- All 23 unit tests pass on Deno, Bun, and Node.js 22+ (Deno reports 29
+  including lifecycle hooks; Bun/Node report 23 unit tests each).
+
+---
+
 ## [1.0.4] - 2026-02-20
 
 ### Changed
